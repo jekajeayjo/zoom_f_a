@@ -15,6 +15,8 @@ import Auth from '@/pages/Authorisation.vue'
 import AccountsList from '@/pages/AccountsList.vue'
 
 import MenuList from '@/pages/MenuList.vue'
+
+import RulerList from '@/pages/RulerList.vue'
 import { useCommonStore } from '@/stores/CommonStore';
 
 
@@ -41,6 +43,11 @@ const router = createRouter({
       path: '/menu',
       name: 'menus',
       component: MenuList
+    },
+    {
+      path: '/ruler-list',
+      name: 'ruler',
+      component: RulerList
     },
     // {
     //   path: '/about',

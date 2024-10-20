@@ -18,7 +18,8 @@ export const useCommonStore = defineStore('commonStore', {
       acceptToken: '',
       refreshToken: ''
     }),
-    url: 'http://95.169.182.6:8080/api/v1/'
+    // url: 'http://95.169.182.6:8080/api/v1/'
+    url: 'http://127.0.0.1:8080/api/v1/'
   }),
   
   actions: {

@@ -7,9 +7,7 @@ const commonStore = useCommonStore();
 const errorMessage = ref('')
 const headers = ref(
     [
-        { title: 'Наименование категории', key: 'value' },
-        { title: 'Изображение', key: 'image' },
-        { title: 'Статус', key: 'isEnabled' },
+        { title: 'Наименование размера', key: 'value' },
         { title: 'Действие', key: 'actions' },
     ])
 
@@ -18,11 +16,6 @@ const languageList = ref({
     value: '',
     image: '',
     isEnabled: ''
-})
-
-const rulerList = ref({
-    id: '',
-    value: '',
 })
 
 const items = ref([
@@ -35,9 +28,7 @@ const items = ref([
 ])
 const menuListRequest = ref({
     page: 0,
-    size: 5,
-    totalPages:0,
-    totalElements:0,
+    size: 10,
     sortDir: 'ASC',
     criteria: []
 })
@@ -77,20 +68,20 @@ const newItemCategory = ref(
 
 const dialogCategory = ref(false)
 
-const getMenuCategoryListSuccess = (response) => {
-    console.log('getAccountsListSuccess', response);
+const getMenuItemSizeListSuccess = (response) => {
+    console.log('getMenuItemSizeListSuccess', response);
     items.value = response.data.content
 
 
 }
 
-const getMenuCategoryListError = (err) => {
+const getMenuItemSizeListError = (err) => {
     console.log('getMenuCategoryListError' + err)
 
 }
 
-const getMenuCategoryList = (payload) => {
-    commonStore.sendRequestPut({ path: 'menu/category-page', data: payload, success: getMenuCategoryListSuccess, error: getMenuCategoryListError })
+const getMenuItemSizeList = (payload) => {
+    commonStore.sendRequestPut({ path: 'common/item-size-page', data: payload, success: getMenuItemSizeListSuccess, error: getMenuItemSizeListError })
 }
 
 const geLanguageListSuccess = (response) => {
@@ -109,23 +100,6 @@ const geLanguageList = () => {
     commonStore.sendRequestGet({ path: 'common/language-list', success: geLanguageListSuccess, error: geLanguageListError })
 }
 
-
-const geRulerListSuccess = (response) => {
-    console.log('geRulerListSuccess', response);
-    rulerList.value = response.data
-
-
-}
-
-const geRulerListError = (text) => {
-    console.log('geLanguageListError' + text)
-
-}
-
-const geRulerList = () => {
-    commonStore.sendRequestGet({ path: 'common/item-size-list', success: geRulerListSuccess, error: geRulerListError })
-}
-
 const editItemCategory = (item) => {
     dialogCategory.value = true
     editedItemCategory.value = item
@@ -137,23 +111,23 @@ const closeCategory = () => {
     dialogCategory.value = false
 }
 
-const saveCategory = () => {
+const saveItemSize = () => {
     errorMessage.value = ''
-    console.log("saveCategory")
+    console.log("saveItemSize")
     if (editedItemCategory.value.id == '')
-        commonStore.sendRequestPost({ path: 'menu/category', data: editedItemCategory.value, success: saveCategorySuccess, error: saveCategoryError })
+        commonStore.sendRequestPost({ path: 'common/item-size', data: editedItemCategory.value, success: saveItemSizeSuccess, error: saveItemSizeError })
     else
-        commonStore.sendRequestPut({ path: 'menu/category', success: saveCategorySuccess, error: saveCategoryError })
+        commonStore.sendRequestPut({ path: 'common/item-size',data: editedItemCategory.value, success: saveItemSizeSuccess, error: saveItemSizeError })
 
 }
 
-const saveCategorySuccess = (response) => {
+const saveItemSizeSuccess = (response) => {
     console.log('getAccountsListSuccess', response);
     dialogCategory.value = false;
-    getMenuCategoryList(menuListRequest.value);
+    getMenuItemSizeList(menuListRequest.value);
 }
 
-const saveCategoryError = (err) => {
+const saveItemSizeError = (err) => {
     errorMessage.value = err.message
 
 }
@@ -167,19 +141,18 @@ const addLanguage = () => {
 }
 
 onMounted(() => {
-    getMenuCategoryList(menuListRequest.value);
+    getMenuItemSizeList(menuListRequest.value);
     geLanguageList();
-    geRulerList();
 })
 
 </script>
 <template>
 
-    <v-data-table  :items-per-page-options="[5,10,15,20]"  show-expand dense :items-per-page="menuListRequest.size" :items-length="menuListRequest.totalElements"  :headers="headers" :items="items">
+    <v-data-table  dense :headers="headers" :items="items">
         <template v-slot:expanded-row="{ columns, item }">
       <tr>
         <td :colspan="columns.length">
-         <item-list :item-category-id="item.id" :ruler-list="rulerList" :language-list="languageList"></item-list>
+         <item-list :item-category-id="item.id" :language-list="languageList"></item-list>
         </td>
       </tr>
     </template>
@@ -210,8 +183,9 @@ onMounted(() => {
 
                                     <v-col cols="12" sm="12" md="12">
                                         <v-text-field v-model="editedItemCategory.value"
-                                            label="Наименование категории"></v-text-field>
+                                            label="Наименование размера"></v-text-field>
                                     </v-col>
+                                    
 
                                     <v-col cols="=12">
                                         <v-divider></v-divider>
@@ -245,7 +219,7 @@ onMounted(() => {
                             <v-btn color="red darken-1" text
                                 @click="closeCategory"><v-icon>mdi-close-octagon-outline</v-icon>
                                 <v-tooltip activator="parent" location="top">Закрыть</v-tooltip></v-btn>
-                            <v-btn color="blue" text @click="saveCategory"><v-icon>mdi-content-save</v-icon> <v-tooltip
+                            <v-btn color="blue" text @click="saveItemSize"><v-icon>mdi-content-save</v-icon> <v-tooltip
                                     activator="parent" location="top">Сохранить</v-tooltip></v-btn>
                         </v-card-actions>
                     </v-card>
@@ -257,9 +231,7 @@ onMounted(() => {
             <v-icon small class="mr-2" @click="editItemCategory(item)">
                 mdi-pencil
             </v-icon>
-            <v-icon small @click="changeStatusOfItem(item)">
-                mdi-eye
-            </v-icon>
+            
         </template>
     </v-data-table>
 

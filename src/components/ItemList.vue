@@ -19,6 +19,15 @@ const props = defineProps({
             image: '',
             isEnabled: ''
         }]
+    },
+    rulerList: {
+        type: Array,
+        required: false,
+        default: [{
+            id: '',
+            value: '',
+            
+        }]
     }
 })
 const errorMessage = ref('')
@@ -45,13 +54,17 @@ const editedItemCategory = ref(
         id: '',
         value: '',
         menuCategoryId: '',
+        price:'',
+        size:'',
+        menuItemSizeId:'',
         image: '',
         isEnabled: false,
         languages: [
             {
                 id: '',
                 languageId: '',
-                value: ''
+                value: '',
+                descriptions:''
             }
         ]
     }
@@ -82,7 +95,9 @@ const languageItem = ref({
 
 const menuItemListRequest = ref({
     page: 0,
-    size: 10,
+    size: 5,
+    totalPages:0,
+    totalElements:0,
     sortDir: 'ASC',
     criteria: []
 })
@@ -90,8 +105,9 @@ const menuItemListRequest = ref({
 const getMenuItemListSuccess = (response) => {
     console.log('getMenuItemListSuccess', response);
     items.value = response.data.content
-
-
+    menuItemListRequest.value.page=response.data.page
+    menuItemListRequest.value.totalPages=response.data.totalPages
+    menuItemListRequest.value.totalElements=response.data.totalElements
 }
 
 const getMenuItemListError = (err) => {
@@ -144,7 +160,7 @@ const saveItem = () => {
         if (editedItemCategory.value.id == '')
             commonStore.sendRequestPost({ path: 'menu/item', data: editedItemCategory.value, success: saveItemSuccess, error: saveItemError })
         else
-            commonStore.sendRequestPut({ path: 'menu/item', success: saveItemSuccess, error: saveItemError })
+            commonStore.sendRequestPut({ path: 'menu/item',data: editedItemCategory.value, success: saveItemSuccess, error: saveItemError })
 
     }
 }
@@ -171,7 +187,7 @@ onMounted(() => {
 
 </script>
 <template>
-    <v-data-table dense :headers="headers" :items="items">
+    <v-data-table  :items-per-page-options="[5,10,15,20]" :items-per-page="menuItemListRequest.size" :items-length="menuItemListRequest.totalElements" dense :headers="headers" :items="items">
         <template v-slot:expanded-row="{ columns, item }">
             <tr>
                 <td :colspan="columns.length">
@@ -207,7 +223,18 @@ onMounted(() => {
                                         <v-text-field v-model="editedItemCategory.value"
                                             label="Наименование товара"></v-text-field>
                                     </v-col>
-
+                                    <v-col cols="12" sm="12" md="12">
+                                        <v-text-field  type="number" v-model="editedItemCategory.price"
+                                             label="Цена"></v-text-field>
+                                    </v-col>
+                                     <v-col cols="12">
+                                        <v-select label="Вид измерения" :items="rulerList" item-title="value" item-value="id"
+                                            v-model="editedItemCategory.menuItemSizeId"></v-select>
+                                    </v-col>
+                                    <v-col cols="12" sm="12" md="12">
+                                        <v-text-field  type="number" v-model="editedItemCategory.size"
+                                             label="Количество"></v-text-field>
+                                    </v-col>
                                     <v-col cols="=12">
                                         <v-divider></v-divider>
                                     </v-col>
@@ -227,6 +254,9 @@ onMounted(() => {
                                     </v-col>
                                     <v-col cols="12">
                                         <v-text-field label="Наименование" v-model="language.value"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12">
+                                        <v-text-field label="Описание" v-model="language.descriptions"></v-text-field>
                                     </v-col>
                                     <v-col cols="=12">
                                         <v-divider></v-divider>

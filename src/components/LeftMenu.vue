@@ -55,13 +55,27 @@ onMounted(() => {
 
     <v-divider></v-divider>
 
-    <v-list density="compact" nav>
+    <v-list density="compact" nav >
       <!-- <v-list-item prepend-icon="mdi-home-city" title="Home" value="home"></v-list-item> -->
       <v-list-item link @click="clickPage('/accounts')" prepend-icon="mdi-account-group-outline" title="Пользователи"
         value="account"></v-list-item>
       <v-list-item link @click="clickPage('/menu')" prepend-icon="mdi-food-fork-drink" title="Меню"
         value="users"></v-list-item>
+
+        
+        <v-list-group value="Actions">
+          <template v-slot:activator="{ props }">
+            <v-list-item
+            prepend-icon="mdi-cog" 
+              v-bind="props"
+              title="Настройки"
+            ></v-list-item>
+          </template>
+          <v-list-item link @click="clickPage('/ruler-list')" prepend-icon="mdi-ruler" title="Размеры"
+          value="users"></v-list-item>
+        </v-list-group>
     </v-list>
+    
   </v-navigation-drawer>
 
 
