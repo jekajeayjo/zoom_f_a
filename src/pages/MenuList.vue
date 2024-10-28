@@ -198,9 +198,10 @@ onMounted(() => {
                             <v-row>
                                 <v-col cols="11" class="mt-3"><span class="headline "> Детальная информация о
                                         категории</span></v-col>
-                                <v-col> <v-switch color="green" true-value="true" false-value="false"
+                                <v-col> <v-switch color="green"
                                         v-model="editedItemCategory.isEnabled"></v-switch>
                                 </v-col>
+                               
                             </v-row>
                         </v-card-title>
 
