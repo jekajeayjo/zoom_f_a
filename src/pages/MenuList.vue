@@ -143,7 +143,7 @@ const saveCategory = () => {
     if (editedItemCategory.value.id == '')
         commonStore.sendRequestPost({ path: 'menu/category', data: editedItemCategory.value, success: saveCategorySuccess, error: saveCategoryError })
     else
-        commonStore.sendRequestPut({ path: 'menu/category', success: saveCategorySuccess, error: saveCategoryError })
+        commonStore.sendRequestPut({ path: 'menu/category',data:editedItemCategory.value, success: saveCategorySuccess, error: saveCategoryError })
 
 }
 
