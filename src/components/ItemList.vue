@@ -26,7 +26,7 @@ const props = defineProps({
         default: [{
             id: '',
             value: '',
-            
+
         }]
     }
 })
@@ -54,9 +54,9 @@ const editedItemCategory = ref(
         id: '',
         value: '',
         menuCategoryId: '',
-        price:'',
-        size:'',
-        menuItemSizeId:'',
+        price: '',
+        size: '',
+        menuItemSizeId: '',
         image: '',
         isEnabled: false,
         languages: [
@@ -64,7 +64,7 @@ const editedItemCategory = ref(
                 id: '',
                 languageId: '',
                 value: '',
-                descriptions:''
+                descriptions: ''
             }
         ]
     }
@@ -96,8 +96,8 @@ const languageItem = ref({
 const menuItemListRequest = ref({
     page: 0,
     size: 5,
-    totalPages:0,
-    totalElements:0,
+    totalPages: 0,
+    totalElements: 0,
     sortDir: 'ASC',
     criteria: []
 })
@@ -105,9 +105,9 @@ const menuItemListRequest = ref({
 const getMenuItemListSuccess = (response) => {
     console.log('getMenuItemListSuccess', response);
     items.value = response.data.content
-    menuItemListRequest.value.page=response.data.page
-    menuItemListRequest.value.totalPages=response.data.totalPages
-    menuItemListRequest.value.totalElements=response.data.totalElements
+    menuItemListRequest.value.page = response.data.page
+    menuItemListRequest.value.totalPages = response.data.totalPages
+    menuItemListRequest.value.totalElements = response.data.totalElements
 }
 
 const getMenuItemListError = (err) => {
@@ -155,12 +155,12 @@ const saveItem = () => {
     if (editedItemCategory.value.languages.length == 0) {
         errorMessage.value = 'Не выбран не один язык'
     }
-    else{
-        editedItemCategory.value.menuCategoryId=props.itemCategoryId
+    else {
+        editedItemCategory.value.menuCategoryId = props.itemCategoryId
         if (editedItemCategory.value.id == '')
             commonStore.sendRequestPost({ path: 'menu/item', data: editedItemCategory.value, success: saveItemSuccess, error: saveItemError })
         else
-            commonStore.sendRequestPut({ path: 'menu/item',data: editedItemCategory.value, success: saveItemSuccess, error: saveItemError })
+            commonStore.sendRequestPut({ path: 'menu/item', data: editedItemCategory.value, success: saveItemSuccess, error: saveItemError })
 
     }
 }
@@ -180,6 +180,13 @@ const addNewItem = () => {
     errorMessage.value = '';
     editedItemCategory.value = JSON.parse(JSON.stringify(newItemCategory.value))
 }
+function loadItems({ page, itemsPerPage, sortBy }) {
+    menuItemListRequest.value.page=page-1
+    menuItemListRequest.value.size=itemsPerPage
+    getMenuItemList(menuItemListRequest.value)
+
+}
+
 onMounted(() => {
     getMenuItemList(menuItemListRequest.value);
 
@@ -187,7 +194,8 @@ onMounted(() => {
 
 </script>
 <template>
-    <v-data-table  :items-per-page-options="[5,10,15,20]" :items-per-page="menuItemListRequest.size" :items-length="menuItemListRequest.totalElements" dense :headers="headers" :items="items">
+    <v-data-table-server :items-per-page-options="[5, 10, 15, 20]" :items-per-page="menuItemListRequest.size"
+        :items-length="menuItemListRequest.totalElements" dense :headers="headers" :items="items"    @update:options="loadItems">
         <template v-slot:expanded-row="{ columns, item }">
             <tr>
                 <td :colspan="columns.length">
@@ -209,8 +217,7 @@ onMounted(() => {
                             <v-row>
                                 <v-col cols="11" class="mt-3"><span class="headline "> Детальная информация о
                                         товаре</span></v-col>
-                                <v-col> <v-switch color="green" 
-                                        v-model="editedItemCategory.isEnabled"></v-switch>
+                                <v-col> <v-switch color="green" v-model="editedItemCategory.isEnabled"></v-switch>
                                 </v-col>
                             </v-row>
                         </v-card-title>
@@ -224,16 +231,16 @@ onMounted(() => {
                                             label="Наименование товара"></v-text-field>
                                     </v-col>
                                     <v-col cols="12" sm="12" md="12">
-                                        <v-text-field  type="number" v-model="editedItemCategory.price"
-                                             label="Цена"></v-text-field>
+                                        <v-text-field type="number" v-model="editedItemCategory.price"
+                                            label="Цена"></v-text-field>
                                     </v-col>
-                                     <v-col cols="12">
-                                        <v-select label="Вид измерения" :items="rulerList" item-title="value" item-value="id"
-                                            v-model="editedItemCategory.menuItemSizeId"></v-select>
+                                    <v-col cols="12">
+                                        <v-select label="Вид измерения" :items="rulerList" item-title="value"
+                                            item-value="id" v-model="editedItemCategory.menuItemSizeId"></v-select>
                                     </v-col>
                                     <v-col cols="12" sm="12" md="12">
-                                        <v-text-field  type="number" v-model="editedItemCategory.size"
-                                             label="Количество"></v-text-field>
+                                        <v-text-field type="number" v-model="editedItemCategory.size"
+                                            label="Количество"></v-text-field>
                                     </v-col>
                                     <v-col cols="=12">
                                         <v-divider></v-divider>
@@ -286,5 +293,5 @@ onMounted(() => {
                 mdi-eye
             </v-icon>
         </template>
-    </v-data-table>
+    </v-data-table-server>
 </template>

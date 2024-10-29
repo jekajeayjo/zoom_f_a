@@ -36,8 +36,8 @@ const items = ref([
 const menuListRequest = ref({
     page: 0,
     size: 5,
-    totalPages:0,
-    totalElements:0,
+    totalPages: 0,
+    totalElements: 0,
     sortDir: 'ASC',
     criteria: []
 })
@@ -80,8 +80,9 @@ const dialogCategory = ref(false)
 const getMenuCategoryListSuccess = (response) => {
     console.log('getAccountsListSuccess', response);
     items.value = response.data.content
-
-
+    menuListRequest.value.totalElements = response.data.totalElements
+    menuListRequest.value.totalPages = response.data.totalPages
+    console.log('getAccountsListSuccess')
 }
 
 const getMenuCategoryListError = (err) => {
@@ -143,7 +144,7 @@ const saveCategory = () => {
     if (editedItemCategory.value.id == '')
         commonStore.sendRequestPost({ path: 'menu/category', data: editedItemCategory.value, success: saveCategorySuccess, error: saveCategoryError })
     else
-        commonStore.sendRequestPut({ path: 'menu/category',data:editedItemCategory.value, success: saveCategorySuccess, error: saveCategoryError })
+        commonStore.sendRequestPut({ path: 'menu/category', data: editedItemCategory.value, success: saveCategorySuccess, error: saveCategoryError })
 
 }
 
@@ -165,6 +166,12 @@ const addLanguage = () => {
         value: ''
     })
 }
+function loadItems({ page, itemsPerPage, sortBy }) {
+    menuListRequest.value.page=page-1
+    menuListRequest.value.size=itemsPerPage
+    getMenuCategoryList(menuListRequest.value)
+
+}
 
 onMounted(() => {
     getMenuCategoryList(menuListRequest.value);
@@ -174,22 +181,24 @@ onMounted(() => {
 
 </script>
 <template>
-
-    <v-data-table  :items-per-page-options="[5,10,15,20]"  show-expand dense :items-per-page="menuListRequest.size" :items-length="menuListRequest.totalElements"  :headers="headers" :items="items">
+    {{ menuListRequest.totalElements }}
+    <v-data-table-server :items-per-page-options="[5, 10, 15, 20]" show-expand dense :items-per-page="menuListRequest.size"
+         :headers="headers" :items="items" :items-length="menuListRequest.totalElements"     @update:options="loadItems">
         <template v-slot:expanded-row="{ columns, item }">
-      <tr>
-        <td :colspan="columns.length">
-         <item-list :item-category-id="item.id" :ruler-list="rulerList" :language-list="languageList"></item-list>
-        </td>
-      </tr>
-    </template>
+            <tr>
+                <td :colspan="columns.length">
+                    <item-list :item-category-id="item.id" :ruler-list="rulerList"
+                        :language-list="languageList"></item-list>
+                </td>
+            </tr>
+        </template>
         <template v-slot:top>
             <v-toolbar flat color="gray">
                 <v-dialog v-model="dialogCategory" max-width="70%">
                     <template v-slot:activator="{ on }">
                         <v-btn color="white" class="mb-2 mt-4"
-                            v-on:click="dialogCategory = !dialogCategory; errorMessage = '';editedItemCategory=newItemCategory">
-                            <v-icon >mdi-plus</v-icon> Добавить</v-btn>
+                            v-on:click="dialogCategory = !dialogCategory; errorMessage = ''; editedItemCategory = newItemCategory">
+                            <v-icon>mdi-plus</v-icon> Добавить</v-btn>
 
                     </template>
                     <v-card>
@@ -198,10 +207,9 @@ onMounted(() => {
                             <v-row>
                                 <v-col cols="11" class="mt-3"><span class="headline "> Детальная информация о
                                         категории</span></v-col>
-                                <v-col> <v-switch color="green"
-                                        v-model="editedItemCategory.isEnabled"></v-switch>
+                                <v-col> <v-switch color="green" v-model="editedItemCategory.isEnabled"></v-switch>
                                 </v-col>
-                               
+
                             </v-row>
                         </v-card-title>
 
@@ -262,7 +270,7 @@ onMounted(() => {
                 mdi-eye
             </v-icon>
         </template>
-    </v-data-table>
+    </v-data-table-server>
 
     <!-- <pre>{{ sortBy }}</pre> -->
 </template>
